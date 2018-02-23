@@ -33,6 +33,8 @@ namespace Microsoft.Bot.Sample.QnABot
             string json = JsonConvert.SerializeObject(message, Formatting.Indented);
             System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
 
+            await context.PostAsync("Your query is " + message.ChannelData.query);
+
             
             var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
             var qnaKBId = Utils.GetAppSetting("QnAKnowledgebaseId");
