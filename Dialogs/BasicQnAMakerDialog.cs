@@ -7,6 +7,8 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.CognitiveServices.QnAMaker;
 using Microsoft.Bot.Connector;
 
+using Newtonsoft.Json;
+
 namespace Microsoft.Bot.Sample.QnABot
 {
     [Serializable]
@@ -26,7 +28,8 @@ namespace Microsoft.Bot.Sample.QnABot
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text );
             string json = JsonConvert.SerializeObject(message, Formatting.Indented);
-            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
+            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);1
+
             
             var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
             var qnaKBId = Utils.GetAppSetting("QnAKnowledgebaseId");
