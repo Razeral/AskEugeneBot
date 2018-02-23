@@ -24,6 +24,7 @@ namespace Microsoft.Bot.Sample.QnABot
             /* When MessageReceivedAsync is called, it's passed an IAwaitable<IMessageActivity>. To get the message,
             *  await the result. */
             var message = await result;
+            System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text );
             
             var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
             var qnaKBId = Utils.GetAppSetting("QnAKnowledgebaseId");
