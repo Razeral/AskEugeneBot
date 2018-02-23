@@ -31,7 +31,7 @@ namespace Microsoft.Bot.Sample.QnABot
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text );
             string json = JsonConvert.SerializeObject(message, Formatting.Indented);
-            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);1
+            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
 
             
             var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
