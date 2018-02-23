@@ -25,6 +25,8 @@ namespace Microsoft.Bot.Sample.QnABot
             *  await the result. */
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text );
+            string json = JsonConvert.SerializeObject(message, Formatting.Indented);
+            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
             
             var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
             var qnaKBId = Utils.GetAppSetting("QnAKnowledgebaseId");
