@@ -7,6 +7,9 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.CognitiveServices.QnAMaker;
 using Microsoft.Bot.Connector;
 
+using System.Collections.Generic;
+using System.Net;
+using System.IO;
 using Newtonsoft.Json;
 
 namespace Microsoft.Bot.Sample.QnABot
