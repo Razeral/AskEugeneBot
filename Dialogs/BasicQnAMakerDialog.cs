@@ -57,7 +57,10 @@ namespace Microsoft.Bot.Sample.QnABot
             System.Diagnostics.Trace.TraceInformation(">>1>> " + (message.Text.Split(' '))[1]);
 
             if ((message.Text.Split(' '))[0] == "teach")
+            {
                 System.Diagnostics.Trace.TraceInformation((message.Text.Split(' '))[0] + " new word " + (message.Text.Split(' '))[1]);
+                context.Wait(TeachAcronymAsync);
+            }
             try
             {
                 //await context.PostAsync("Your query is " + message.ChannelData.query);
@@ -128,6 +131,7 @@ namespace Microsoft.Bot.Sample.QnABot
         private async Task TeachAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
             var message = await result;
+            System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> " + message.Text);
 
             context.Wait(MessageReceivedAsync);
         }
