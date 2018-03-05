@@ -28,8 +28,8 @@ namespace Microsoft.Bot.Sample.QnABot
 
         public AcronymEntity() { }
 
-        public string LongName { get; set; }
-        public string Description { get; set; }
+        public string longName { get; set; }
+        public string description { get; set; }
     }
 
     [Serializable]
@@ -91,7 +91,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     foreach (AcronymEntity entity in table.ExecuteQuery(query))
                     {
                         if (entity.RowKey.ToUpper() == message.Text.Trim().ToUpper())
-                            msg += " " + entity.LongName;
+                            msg += " " + entity.longName;
                     }
                     System.Diagnostics.Trace.TraceInformation("5");
                     if (msg.Length > 0)
@@ -216,8 +216,8 @@ namespace Microsoft.Bot.Sample.QnABot
 
                     // Create a new customer entity.
                     AcronymEntity record = new AcronymEntity("JTC", newAcronym);
-                    record.LongName = newAcronymMeaning;
-                    record.Description = "-";
+                    record.longName = newAcronymMeaning;
+                    record.description = "-";
                     //record.Timestamp = 
                     //TableEntity record = new TableEntity("JTC", "WHATISWRONG");
 
@@ -229,8 +229,8 @@ namespace Microsoft.Bot.Sample.QnABot
 
                     System.Diagnostics.Trace.TraceInformation(record.PartitionKey);
                     System.Diagnostics.Trace.TraceInformation(record.RowKey);
-                    System.Diagnostics.Trace.TraceInformation(record.LongName);
-                    System.Diagnostics.Trace.TraceInformation(record.Description);
+                    System.Diagnostics.Trace.TraceInformation(record.longName);
+                    System.Diagnostics.Trace.TraceInformation(record.description);
 
 
                     // Execute the insert operation.
