@@ -12,8 +12,26 @@ using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 
+using Microsoft.Azure;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.CosmosDB.Table;
+
 namespace Microsoft.Bot.Sample.QnABot
 {
+    public class AcronymEntity : TableEntity
+    {
+        public AcronymEntity(string pkey, string rkey)
+        {
+            this.PartitionKey = pkey;
+            this.RowKey = rkey;
+        }
+
+        public AcronymEntity() { }
+
+        public string LongName { get; set; }
+        public string Description { get; set; }
+    }
+
     [Serializable]
     public class RootDialog :  IDialog<object>
     {
@@ -45,15 +63,23 @@ namespace Microsoft.Bot.Sample.QnABot
             CloudTable table = tableClient.GetTableReference("acronyms");
 
             // Create a new customer entity.
-            CustomerEntity customer1 = new CustomerEntity("JTC", "Test2");
-            customer1.Email = "Walter@contoso.com";
-            customer1.PhoneNumber = "425-555-0101";
+            TableEntity customer1 = new TableEntity("JTC", "Test2");
+
+            TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
+            var msg = "";
+
+            foreach (AcronymEntity entity in table.ExecuteQuery(query))
+            {
+                if (entity.RowKey == "TEST")
+                    msg += " " + entity.LongName;
+            }
+            
 
             // Create the TableOperation object that inserts the customer entity.
-            TableOperation insertOperation = TableOperation.Insert(customer1);
+            //TableOperation insertOperation = TableOperation.Insert(customer1);
 
             // Execute the insert operation.
-            table.Execute(insertOperation);
+            //table.Execute(insertOperation);
 
 
             /*var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
@@ -68,7 +94,8 @@ namespace Microsoft.Bot.Sample.QnABot
             {
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
             }*/
-            
+            await context.PostAsync(msg);
+            context.Wait(MessageReceivedAsync);
         }
 
         private async Task AfterAnswerAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
