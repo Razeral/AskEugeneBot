@@ -217,6 +217,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     // Create a new customer entity.
                     AcronymEntity record = new AcronymEntity("JTC", newAcronym);
                     record.LongName = newAcronymMeaning;
+                    record.Description = "-";
 
                     // Create the TableOperation object that inserts the customer entity.
                     TableOperation insertOperation = TableOperation.Insert(record);
