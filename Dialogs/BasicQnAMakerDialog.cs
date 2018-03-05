@@ -53,6 +53,8 @@ namespace Microsoft.Bot.Sample.QnABot
 
             var msg = "";
 
+            if ((message.Text.Split(' '))[0] == "teach")
+                System.Diagnostics.Trace.TraceInformation((message.Text.Split(' '))[0] + " new word " + (message.Text.Split(' '))[1]);
             try
             {
                 //await context.PostAsync("Your query is " + message.ChannelData.query);
@@ -119,7 +121,13 @@ namespace Microsoft.Bot.Sample.QnABot
             // wait for the next user message
             context.Wait(MessageReceivedAsync);
         }
-    }
+
+        private async Task TeachAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            var message = await result;
+
+            context.Wait(MessageReceivedAsync);
+        }
 
     // For more information about this template visit http://aka.ms/azurebots-csharp-qnamaker
     [Serializable]
