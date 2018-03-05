@@ -196,33 +196,41 @@ namespace Microsoft.Bot.Sample.QnABot
 
             if (message.Text.ToLower() == "jtcivsd1")
             {
-                var newAcronym = "";
-                var newAcronymMeaning = "";
-                context.UserData.TryGetValue("newAcronym", out newAcronym);
-                context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
-
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                    CloudConfigurationManager.GetSetting("TableStorageConnString"));
-
-                // Create the table client.
-                CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-                // Create the CloudTable object that represents the "people" table.
-                CloudTable table = tableClient.GetTableReference("acronyms");
-
-                // Create a new customer entity.
-                AcronymEntity record = new AcronymEntity("JTC", newAcronym)
+                try
                 {
-                    LongName = newAcronymMeaning
-                };
+                    var newAcronym = "";
+                    var newAcronymMeaning = "";
+                    context.UserData.TryGetValue("newAcronym", out newAcronym);
+                    context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
 
-                // Create the TableOperation object that inserts the customer entity.
-                TableOperation insertOperation = TableOperation.Insert(record);
+                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                        CloudConfigurationManager.GetSetting("TableStorageConnString"));
 
-                // Execute the insert operation.
-                table.Execute(insertOperation);
+                    // Create the table client.
+                    CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
 
-                await context.PostAsync("Great! Learnt something new today!");
+                    // Create the CloudTable object that represents the "people" table.
+                    CloudTable table = tableClient.GetTableReference("acronyms");
+
+                    // Create a new customer entity.
+                    AcronymEntity record = new AcronymEntity("JTC", newAcronym)
+                    {
+                        LongName = newAcronymMeaning
+                    };
+
+                    // Create the TableOperation object that inserts the customer entity.
+                    TableOperation insertOperation = TableOperation.Insert(record);
+
+                    // Execute the insert operation.
+                    table.Execute(insertOperation);
+
+                    await context.PostAsync("Great! Learnt something new today!");
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Trace.TraceInformation(e.Message);
+                    await context.PostAsync("Sorry something went wrong!");
+                }
             }
             else
             {
