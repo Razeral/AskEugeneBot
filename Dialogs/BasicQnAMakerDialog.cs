@@ -150,8 +150,8 @@ namespace Microsoft.Bot.Sample.QnABot
             context.UserData.SetValue("newAcronym", newAcronym);
 
 
-            context.Wait(MessageReceivedAsync);
-            //context.Wait(UnderstandAcronymAsync);
+            //context.Wait(MessageReceivedAsync);
+            context.Wait(UnderstandAcronymAsync);
         }
 
         private async Task UnderstandAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -159,7 +159,8 @@ namespace Microsoft.Bot.Sample.QnABot
             System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> Before result");
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> " + message.Text);
-            context.UserData.TryGetValue("newAcronym", out string newAcronym);
+            var newAcronym = "";
+            context.UserData.TryGetValue("newAcronym", out newAcronym);
             context.UserData.SetValue("newAcronymMeaning", message.Text);
 
             PromptDialog.Confirm(
@@ -195,8 +196,10 @@ namespace Microsoft.Bot.Sample.QnABot
 
             if (message.Text.ToLower() == "jtcivsd1")
             {
-                context.UserData.TryGetValue("newAcronym", out string newAcronym);
-                context.UserData.TryGetValue("newAcronymMeaning", out string newAcronymMeaning);
+                var newAcronym = "";
+                var newAcronymMeaning = "";
+                context.UserData.TryGetValue("newAcronym", out newAcronym);
+                context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
 
                 CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                     CloudConfigurationManager.GetSetting("TableStorageConnString"));
