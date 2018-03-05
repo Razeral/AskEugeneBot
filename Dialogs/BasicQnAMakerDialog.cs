@@ -51,29 +51,43 @@ namespace Microsoft.Bot.Sample.QnABot
             string json = JsonConvert.SerializeObject(message, Formatting.Indented);
             System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
 
-            await context.PostAsync("Your query is " + message.ChannelData.query);
-
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-            CloudConfigurationManager.GetSetting("TableStorageConnString"));
-
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-            // Create the CloudTable object that represents the "people" table.
-            CloudTable table = tableClient.GetTableReference("acronyms");
-
-            // Create a new customer entity.
-            TableEntity customer1 = new TableEntity("JTC", "Test2");
-
-            TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
             var msg = "";
 
-            foreach (AcronymEntity entity in table.ExecuteQuery(query))
+            try
             {
-                if (entity.RowKey == "TEST")
-                    msg += " " + entity.LongName;
+                //await context.PostAsync("Your query is " + message.ChannelData.query);
+
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("TableStorageConnString"));
+                System.Diagnostics.Trace.TraceInformation("1");
+
+                // Create the table client.
+                CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+                System.Diagnostics.Trace.TraceInformation("2");
+
+                // Create the CloudTable object that represents the "people" table.
+                CloudTable table = tableClient.GetTableReference("acronyms");
+                System.Diagnostics.Trace.TraceInformation("3");
+
+                // Create a new customer entity.
+                TableEntity customer1 = new TableEntity("JTC", "Test2");
+                System.Diagnostics.Trace.TraceInformation("4");
+
+                TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
+
+                foreach (AcronymEntity entity in table.ExecuteQuery(query))
+                {
+                    if (entity.RowKey == "TEST")
+                        msg += " " + entity.LongName;
+                }
+                System.Diagnostics.Trace.TraceInformation("5");
+
             }
-            
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.TraceInformation(e.Message);
+                await context.PostAsync("There was an error");
+            }
 
             // Create the TableOperation object that inserts the customer entity.
             //TableOperation insertOperation = TableOperation.Insert(customer1);
