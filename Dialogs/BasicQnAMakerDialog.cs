@@ -35,8 +35,28 @@ namespace Microsoft.Bot.Sample.QnABot
 
             await context.PostAsync("Your query is " + message.ChannelData.query);
 
-            
-            var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+            CloudConfigurationManager.GetSetting("TableStorageConnString"));
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("acronyms");
+
+            // Create a new customer entity.
+            CustomerEntity customer1 = new CustomerEntity("JTC", "Test2");
+            customer1.Email = "Walter@contoso.com";
+            customer1.PhoneNumber = "425-555-0101";
+
+            // Create the TableOperation object that inserts the customer entity.
+            TableOperation insertOperation = TableOperation.Insert(customer1);
+
+            // Execute the insert operation.
+            table.Execute(insertOperation);
+
+
+            /*var qnaSubscriptionKey = Utils.GetAppSetting("QnASubscriptionKey");
             var qnaKBId = Utils.GetAppSetting("QnAKnowledgebaseId");
 
             // QnA Subscription Key and KnowledgeBase Id null verification
@@ -47,7 +67,7 @@ namespace Microsoft.Bot.Sample.QnABot
             else
             {
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
-            }
+            }*/
             
         }
 
