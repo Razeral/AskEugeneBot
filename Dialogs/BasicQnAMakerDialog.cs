@@ -33,7 +33,7 @@ namespace Microsoft.Bot.Sample.QnABot
     }
 
     [Serializable]
-    public class RootDialog :  IDialog<object>
+    public class RootDialog : IDialog<object>
     {
         public async Task StartAsync(IDialogContext context)
         {
@@ -47,7 +47,7 @@ namespace Microsoft.Bot.Sample.QnABot
             /* When MessageReceivedAsync is called, it's passed an IAwaitable<IMessageActivity>. To get the message,
             *  await the result. */
             var message = await result;
-            System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text );
+            System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text);
             string json = JsonConvert.SerializeObject(message, Formatting.Indented);
             System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
 
@@ -84,7 +84,7 @@ namespace Microsoft.Bot.Sample.QnABot
                         msg += " " + entity.LongName;
                 }
                 System.Diagnostics.Trace.TraceInformation("5");
-                if(msg.Length > 0)
+                if (msg.Length > 0)
                 {
                     await context.PostAsync(message.Text + " = " + msg);
                 }
@@ -118,7 +118,7 @@ namespace Microsoft.Bot.Sample.QnABot
             {
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
             }*/
-            
+
             context.Wait(MessageReceivedAsync);
         }
 
@@ -135,6 +135,8 @@ namespace Microsoft.Bot.Sample.QnABot
 
             context.Wait(MessageReceivedAsync);
         }
+
+    }
 
     // For more information about this template visit http://aka.ms/azurebots-csharp-qnamaker
     [Serializable]
