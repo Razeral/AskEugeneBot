@@ -240,7 +240,7 @@ namespace Microsoft.Bot.Sample.QnABot
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Trace.TraceInformation(e.Message);
+                    System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
                     await context.PostAsync("Sorry something went wrong!");
                 }
             }
