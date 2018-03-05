@@ -53,6 +53,9 @@ namespace Microsoft.Bot.Sample.QnABot
 
             var msg = "";
 
+            System.Diagnostics.Trace.TraceInformation(">>0>> " + (message.Text.Split(' '))[0]);
+            System.Diagnostics.Trace.TraceInformation(">>1>> " + (message.Text.Split(' '))[1]);
+
             if ((message.Text.Split(' '))[0] == "teach")
                 System.Diagnostics.Trace.TraceInformation((message.Text.Split(' '))[0] + " new word " + (message.Text.Split(' '))[1]);
             try
