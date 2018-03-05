@@ -200,8 +200,10 @@ namespace Microsoft.Bot.Sample.QnABot
                 {
                     var newAcronym = "";
                     var newAcronymMeaning = "";
+                    
                     context.UserData.TryGetValue("newAcronym", out newAcronym);
                     context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
+                    System.Diagnostics.Trace.TraceInformation("MSG IN StoreConfirmedAcronymAsync -> " + newAcronym + " ||| " + newAcronymMeaning);
 
                     CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                         CloudConfigurationManager.GetSetting("TableStorageConnString"));
@@ -219,8 +221,10 @@ namespace Microsoft.Bot.Sample.QnABot
                     // Create the TableOperation object that inserts the customer entity.
                     TableOperation insertOperation = TableOperation.Insert(record);
 
+                    System.Diagnostics.Trace.TraceInformation("123");
                     // Execute the insert operation.
                     table.Execute(insertOperation);
+                    System.Diagnostics.Trace.TraceInformation("1234");
 
                     await context.PostAsync("Great! Learnt something new today!");
                 }
