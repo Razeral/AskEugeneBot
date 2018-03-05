@@ -218,10 +218,11 @@ namespace Microsoft.Bot.Sample.QnABot
                     AcronymEntity record = new AcronymEntity("JTC", newAcronym);
                     record.LongName = newAcronymMeaning;
                     record.Description = "-";
+                    //record.Timestamp = 
                     //TableEntity record = new TableEntity("JTC", "WHATISWRONG");
 
                     // Create the TableOperation object that inserts the customer entity.
-                    TableOperation insertOperation = TableOperation.Insert(record);
+                    TableOperation insertOperation = TableOperation.InsertOrMerge(record);
 
                     System.Diagnostics.Trace.TraceInformation("123");
 
