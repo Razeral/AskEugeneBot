@@ -149,7 +149,9 @@ namespace Microsoft.Bot.Sample.QnABot
             await context.PostAsync("What does " + newAcronym + " mean?");
             context.UserData.SetValue("newAcronym", newAcronym);
 
-            context.Wait(UnderstandAcronymAsync);
+
+            context.Wait(MessageReceivedAsync);
+            //context.Wait(UnderstandAcronymAsync);
         }
 
         private async Task UnderstandAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
