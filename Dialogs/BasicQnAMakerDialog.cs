@@ -140,6 +140,7 @@ namespace Microsoft.Bot.Sample.QnABot
 
         private async Task TeachAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
+            System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> Before result");
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> " + message.Text);
 
