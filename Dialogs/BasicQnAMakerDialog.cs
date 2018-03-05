@@ -61,6 +61,11 @@ namespace Microsoft.Bot.Sample.QnABot
                 try
                 {
                     System.Diagnostics.Trace.TraceInformation((message.Text.Split(' '))[0] + " new word " + (message.Text.Split(' '))[1]);
+                    var newAcronym = message.Text.Substring(("teach").Length + 1).Trim();
+
+                    await context.PostAsync("What does " + newAcronym + " mean?");
+                    context.UserData.SetValue("newAcronym", newAcronym);
+
                     context.Wait(TeachAcronymAsync);
                 }
                 catch (Exception e)
@@ -96,11 +101,11 @@ namespace Microsoft.Bot.Sample.QnABot
                     System.Diagnostics.Trace.TraceInformation("5");
                     if (msg.Length > 0)
                     {
-                        await context.PostAsync(message.Text + " = " + msg);
+                        await context.PostAsync("From what I know..." + message.Text + " = " + msg);
                     }
                     else
                     {
-                        await context.PostAsync("Tell me the acronym only please. e.g. JTC");
+                        await context.PostAsync("I didn't understand that! :D Ask me an acronym (e.g. JTC) or say \"teach\" followed by a new word to help me learn! (e.g. teach JTC)");
                     }
                 }
                 catch (Exception e)
@@ -145,20 +150,6 @@ namespace Microsoft.Bot.Sample.QnABot
             System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> Before result");
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> " + message.Text);
-            var newAcronym = message.Text.Substring(("teach").Length + 1).Trim();
-            await context.PostAsync("What does " + newAcronym + " mean?");
-            context.UserData.SetValue("newAcronym", newAcronym);
-
-
-            //context.Wait(MessageReceivedAsync);
-            context.Wait(UnderstandAcronymAsync);
-        }
-
-        private async Task UnderstandAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
-        {
-            System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> Before result");
-            var message = await result;
-            System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> " + message.Text);
             var newAcronym = "";
             context.UserData.TryGetValue("newAcronym", out newAcronym);
             context.UserData.SetValue("newAcronymMeaning", message.Text);
