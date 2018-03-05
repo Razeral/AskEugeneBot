@@ -230,6 +230,14 @@ namespace Microsoft.Bot.Sample.QnABot
 
                     await context.PostAsync("Great! Learnt something new today!");
                 }
+                catch (StorageException ex)
+                {
+                    var requestInformation = ex.RequestInformation;
+                    System.Diagnostics.Trace.TraceInformation(requestInformation.HttpStatusCode.ToString());
+                    System.Diagnostics.Trace.TraceInformation(requestInformation.HttpStatusMessage);
+                    System.Diagnostics.Trace.TraceInformation(requestInformation.ExtendedErrorInformation.ErrorCode);
+                    System.Diagnostics.Trace.TraceInformation(requestInformation.ExtendedErrorInformation.ErrorMessage);
+                }
                 catch (Exception e)
                 {
                     System.Diagnostics.Trace.TraceInformation(e.Message);
