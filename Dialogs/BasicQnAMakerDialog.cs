@@ -66,6 +66,7 @@ namespace Microsoft.Bot.Sample.QnABot
                 catch (Exception e)
                 {
                     System.Diagnostics.Trace.TraceInformation(e.Message);
+                    context.Wait(MessageReceivedAsync);
                 }
             }
             else
@@ -107,6 +108,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     System.Diagnostics.Trace.TraceInformation(e.Message);
                     await context.PostAsync("There was an error");
                 }
+                context.Wait(MessageReceivedAsync);
             }
 
             // Create the TableOperation object that inserts the customer entity.
@@ -129,7 +131,7 @@ namespace Microsoft.Bot.Sample.QnABot
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
             }*/
 
-            context.Wait(MessageReceivedAsync);
+            
         }
 
         private async Task AfterAnswerAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
