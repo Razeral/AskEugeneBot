@@ -198,8 +198,8 @@ namespace Microsoft.Bot.Sample.QnABot
             {
                 try
                 {
-                    var newAcronym = "";
-                    var newAcronymMeaning = "";
+                    string newAcronym = "";
+                    string newAcronymMeaning = "";
                     
                     context.UserData.TryGetValue("newAcronym", out newAcronym);
                     context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
@@ -215,10 +215,10 @@ namespace Microsoft.Bot.Sample.QnABot
                     CloudTable table = tableClient.GetTableReference("acronyms");
 
                     // Create a new customer entity.
-                    /*AcronymEntity record = new AcronymEntity("JTC", newAcronym);
+                    AcronymEntity record = new AcronymEntity("JTC", newAcronym);
                     record.LongName = newAcronymMeaning;
-                    record.Description = "-";*/
-                    TableEntity record = new TableEntity("JTC", "WHATISWRONG");
+                    record.Description = "-";
+                    //TableEntity record = new TableEntity("JTC", "WHATISWRONG");
 
                     // Create the TableOperation object that inserts the customer entity.
                     TableOperation insertOperation = TableOperation.Insert(record);
