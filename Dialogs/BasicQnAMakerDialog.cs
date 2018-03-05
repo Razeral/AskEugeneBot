@@ -213,10 +213,8 @@ namespace Microsoft.Bot.Sample.QnABot
                     CloudTable table = tableClient.GetTableReference("acronyms");
 
                     // Create a new customer entity.
-                    AcronymEntity record = new AcronymEntity("JTC", newAcronym)
-                    {
-                        LongName = newAcronymMeaning
-                    };
+                    AcronymEntity record = new AcronymEntity("JTC", newAcronym);
+                    record.LongName = newAcronymMeaning;
 
                     // Create the TableOperation object that inserts the customer entity.
                     TableOperation insertOperation = TableOperation.Insert(record);
