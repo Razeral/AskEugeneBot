@@ -131,7 +131,7 @@ namespace Microsoft.Bot.Sample.QnABot
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
             }*/
 
-            
+
         }
 
         private async Task AfterAnswerAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
@@ -145,14 +145,88 @@ namespace Microsoft.Bot.Sample.QnABot
             System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> Before result");
             var message = await result;
             System.Diagnostics.Trace.TraceInformation("MSG IN TeachAcronymAsync -> " + message.Text);
+            var newAcronym = message.Text.Substring(("teach").Length + 1).Trim();
+            await context.PostAsync("What does " + newAcronym + " mean?");
+            context.UserData.SetValue("newAcronym", newAcronym);
 
-            context.Wait(MessageReceivedAsync);
+            context.Wait(UnderstandAcronymAsync);
         }
 
+        private async Task UnderstandAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> Before result");
+            var message = await result;
+            System.Diagnostics.Trace.TraceInformation("MSG IN UnderstandAcronymAsync -> " + message.Text);
+            context.UserData.TryGetValue("newAcronym", out string newAcronym);
+            context.UserData.SetValue("newAcronymMeaning", message.Text);
+
+            PromptDialog.Confirm(
+                context,
+                StoreAcronymAsync,
+                "So " + newAcronym + " stands for " + message.Text + "?",
+                "Choose one of the choices can?",
+                promptStyle: PromptStyle.Auto);
+        }
+
+        private async Task StoreAcronymAsync(IDialogContext context, IAwaitable<bool> result)
+        {
+            System.Diagnostics.Trace.TraceInformation("MSG IN StoreAcronymAsync -> Before result");
+            var confirm = await result;
+
+            if (confirm)
+            {
+                await context.PostAsync("What's the password?");
+                context.Wait(StoreConfirmedAcronymAsync);
+            }
+            else
+            {
+                await context.PostAsync("Then talk so much for what...");
+                context.Wait(MessageReceivedAsync);
+            }
+        }
+
+        private async Task StoreConfirmedAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        {
+            System.Diagnostics.Trace.TraceInformation("MSG IN StoreConfirmedAcronymAsync -> Before result");
+            var message = await result;
+            System.Diagnostics.Trace.TraceInformation("MSG IN StoreConfirmedAcronymAsync -> " + message.Text);
+
+            if (message.Text.ToLower() == "jtcivsd1")
+            {
+                context.UserData.TryGetValue("newAcronym", out string newAcronym);
+                context.UserData.TryGetValue("newAcronymMeaning", out string newAcronymMeaning);
+
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                    CloudConfigurationManager.GetSetting("TableStorageConnString"));
+
+                // Create the table client.
+                CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+                // Create the CloudTable object that represents the "people" table.
+                CloudTable table = tableClient.GetTableReference("acronyms");
+
+                // Create a new customer entity.
+                AcronymEntity record = new AcronymEntity("JTC", newAcronym);
+                record.LongName = newAcronymMeaning;
+
+                // Create the TableOperation object that inserts the customer entity.
+                TableOperation insertOperation = TableOperation.Insert(record);
+
+                // Execute the insert operation.
+                table.Execute(insertOperation);
+
+                await context.PostAsync("Great! Learnt something new today!");
+            }
+            else
+            {
+                await context.PostAsync("Nope, wrong password.");
+            }
+            context.Wait(MessageReceivedAsync);
+        }
     }
 
-    // For more information about this template visit http://aka.ms/azurebots-csharp-qnamaker
-    [Serializable]
+// For more information about this template visit http://aka.ms/azurebots-csharp-qnamaker
+[Serializable]
     public class BasicQnAMakerDialog : QnAMakerDialog
     {
         // Go to https://qnamaker.ai and feed data, train & publish your QnA Knowledgebase.        
