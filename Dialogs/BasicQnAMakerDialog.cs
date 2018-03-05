@@ -224,6 +224,14 @@ namespace Microsoft.Bot.Sample.QnABot
                     TableOperation insertOperation = TableOperation.Insert(record);
 
                     System.Diagnostics.Trace.TraceInformation("123");
+
+
+                    System.Diagnostics.Trace.TraceInformation(record.PartitionKey);
+                    System.Diagnostics.Trace.TraceInformation(record.RowKey);
+                    System.Diagnostics.Trace.TraceInformation(record.LongName);
+                    System.Diagnostics.Trace.TraceInformation(record.Description);
+
+
                     // Execute the insert operation.
                     table.Execute(insertOperation);
                     System.Diagnostics.Trace.TraceInformation("1234");
