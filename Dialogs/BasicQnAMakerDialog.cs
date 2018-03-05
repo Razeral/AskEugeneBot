@@ -59,29 +59,31 @@ namespace Microsoft.Bot.Sample.QnABot
 
                 CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
                 CloudConfigurationManager.GetSetting("TableStorageConnString"));
-                System.Diagnostics.Trace.TraceInformation("1");
 
                 // Create the table client.
                 CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-                System.Diagnostics.Trace.TraceInformation("2");
 
                 // Create the CloudTable object that represents the "people" table.
                 CloudTable table = tableClient.GetTableReference("acronyms");
-                System.Diagnostics.Trace.TraceInformation("3");
 
                 // Create a new customer entity.
-                TableEntity customer1 = new TableEntity("JTC", "Test2");
-                System.Diagnostics.Trace.TraceInformation("4");
+                //TableEntity customer1 = new TableEntity("JTC", "Test2");
 
                 TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
-
                 foreach (AcronymEntity entity in table.ExecuteQuery(query))
                 {
-                    if (entity.RowKey == "TEST")
+                    if (entity.RowKey.ToUpper() == message.Text.Trim().ToUpper())
                         msg += " " + entity.LongName;
                 }
                 System.Diagnostics.Trace.TraceInformation("5");
-
+                if(msg.Length > 0)
+                {
+                    await context.PostAsync(message.Text + " = " + msg);
+                }
+                else
+                {
+                    await context.PostAsync("Tell me the acronym only please. e.g. JTC");
+                }
             }
             catch (Exception e)
             {
@@ -108,7 +110,7 @@ namespace Microsoft.Bot.Sample.QnABot
             {
                 await context.PostAsync("Please set QnAKnowledgebaseId and QnASubscriptionKey in App Settings. Get them at https://qnamaker.ai.");
             }*/
-            await context.PostAsync(msg);
+            
             context.Wait(MessageReceivedAsync);
         }
 
