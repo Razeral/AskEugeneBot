@@ -49,6 +49,7 @@ namespace Microsoft.Bot.Sample.QnABot
     {
         public async Task StartAsync(IDialogContext context)
         {
+            await context.PostAsync("Hello");
             context.Wait(this.MessageReceivedAsync);
         }
 
@@ -72,9 +73,27 @@ namespace Microsoft.Bot.Sample.QnABot
                 }
                 else
                 {
+                    Random rnd = new Random();
+                    int i = rnd.Next(1, 3);
+                    var question = "";
+
+                    switch(i)
+                    {
+                        case 1:
+                            question = "What does " + newAcronym + " mean?";
+                            break;
+                        case 2:
+                            question = "So... " + newAcronym + " means what?";
+                            break;
+                        case 3:
+                            question = "Ummm. Ok... " + newAcronym + " is?";
+                            break;
+                    }
+
                     var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
 
-                    await context.PostAsync("What does " + newAcronym + " mean?");
+                    //await context.PostAsync("What does " + newAcronym + " mean?");
+                    await context.PostAsync(question);
                     context.UserData.SetValue("newAcronym", newAcronym.ToUpper());
                     context.Wait(TeachAcronymAsync);
                 }
@@ -83,10 +102,6 @@ namespace Microsoft.Bot.Sample.QnABot
             {
                 try
                 {
-                    /*CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                    CloudConfigurationManager.GetSetting("TableStorageConnString"));
-                    CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-                    CloudTable table = tableClient.GetTableReference("acronyms");*/
                     CloudTable table = ConnectToTableStorage.Connect("acronyms");
 
                     TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
@@ -102,7 +117,9 @@ namespace Microsoft.Bot.Sample.QnABot
                     }
 
                     if (msg.Length > 0)
+                    {
                         await context.PostAsync("From what I know... " + message.Text + " = " + msg);
+                    }
                     else
                         await context.PostAsync("I didn't understand that! :D Ask me an acronym (e.g. JTC) or say \"teach\" followed by a new word to help me learn! (e.g. teach JTC)");
                 }
@@ -173,12 +190,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     context.UserData.TryGetValue("newAcronym", out newAcronym);
                     context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
 
-                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                        CloudConfigurationManager.GetSetting("TableStorageConnString"));
-
-                    CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-                    CloudTable table = tableClient.GetTableReference("acronyms");
+                    CloudTable table = ConnectToTableStorage.Connect("acronyms");
 
                     AcronymEntity record = new AcronymEntity("JTC", newAcronym);
                     record.longName = newAcronymMeaning;
@@ -189,14 +201,6 @@ namespace Microsoft.Bot.Sample.QnABot
                     table.Execute(insertOperation);
                     await context.PostAsync("Great! Learnt something new today!");
                 }
-                catch (StorageException ex)
-                {
-                    var requestInformation = ex.RequestInformation;
-                    System.Diagnostics.Trace.TraceInformation(requestInformation.HttpStatusCode.ToString());
-                    System.Diagnostics.Trace.TraceInformation(requestInformation.HttpStatusMessage);
-                    System.Diagnostics.Trace.TraceInformation(requestInformation.ExtendedErrorInformation.ErrorCode);
-                    System.Diagnostics.Trace.TraceInformation(requestInformation.ExtendedErrorInformation.ErrorMessage);
-                }
                 catch (Exception e)
                 {
                     System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
@@ -204,9 +208,7 @@ namespace Microsoft.Bot.Sample.QnABot
                 }
             }
             else
-            {
                 await context.PostAsync("Nope, wrong password.");
-            }
             context.Wait(MessageReceivedAsync);
         }
     }
