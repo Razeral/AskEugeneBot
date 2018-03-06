@@ -92,7 +92,6 @@ namespace Microsoft.Bot.Sample.QnABot
 
                     var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
 
-                    //await context.PostAsync("What does " + newAcronym + " mean?");
                     await context.PostAsync(question);
                     context.UserData.SetValue("newAcronym", newAcronym.ToUpper());
                     context.Wait(TeachAcronymAsync);
@@ -118,7 +117,23 @@ namespace Microsoft.Bot.Sample.QnABot
 
                     if (msg.Length > 0)
                     {
-                        await context.PostAsync("From what I know... " + message.Text + " = " + msg);
+                        Random rnd = new Random();
+                        int i = rnd.Next(1, 3);
+                        var reply = "";
+
+                        switch (i)
+                        {
+                            case 1:
+                                "From what I know... " + message.Text + " = " + msg;
+                                break;
+                            case 2:
+                                "I think someone told me that " + message.Text + " means " + msg;
+                                break;
+                            case 3:
+                                "So simple... " + msg + " lor.";
+                                break;
+                        }
+                        await context.PostAsync(reply);
                     }
                     else
                         await context.PostAsync("I didn't understand that! :D Ask me an acronym (e.g. JTC) or say \"teach\" followed by a new word to help me learn! (e.g. teach JTC)");
