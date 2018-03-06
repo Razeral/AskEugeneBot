@@ -209,7 +209,7 @@ namespace Microsoft.Bot.Sample.QnABot
 
                 try
                 {
-                    TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, newAcronym));
+                    TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "JTC"));
                     foreach (AcronymEntity entity in table.ExecuteQuery(query))
                     {
                         if (entity.RowKey.ToUpper() == newAcronym.ToUpper())
