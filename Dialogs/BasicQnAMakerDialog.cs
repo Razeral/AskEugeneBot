@@ -124,13 +124,13 @@ namespace Microsoft.Bot.Sample.QnABot
                         switch (i)
                         {
                             case 1:
-                                "From what I know... " + message.Text + " = " + msg;
+                                reply = "From what I know... " + message.Text + " = " + msg;
                                 break;
                             case 2:
-                                "I think someone told me that " + message.Text + " means " + msg;
+                                reply = "I think someone told me that " + message.Text + " means " + msg;
                                 break;
                             case 3:
-                                "So simple... " + msg + " lor.";
+                                reply = "So simple... " + msg + " lor.";
                                 break;
                         }
                         await context.PostAsync(reply);
@@ -183,7 +183,8 @@ namespace Microsoft.Bot.Sample.QnABot
             if (confirm)
             {
                 await context.PostAsync("What's the password?");
-                context.Wait(StoreConfirmedAcronymAsync);
+                //context.Wait(StoreConfirmedAcronymAsync);
+                context.Wait(ConfirmConfirmedAcronymAsync);
             }
             else
             {
@@ -192,16 +193,77 @@ namespace Microsoft.Bot.Sample.QnABot
             }
         }
 
-        private async Task StoreConfirmedAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
+        private async Task ConfirmConfirmedAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            var message = await result;
             if (message.Text.ToLower() == "jtcivsd1")
+            {
+                string newAcronym = "";
+                context.UserData.TryGetValue("newAcronym", out newAcronym);
+
+                string longName = "";
+
+                CloudTable table = ConnectToTableStorage.Connect("acronyms");
+
+                TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, newAcronym));
+                foreach (AcronymEntity entity in table.ExecuteQuery(query))
+                {
+                    if (entity.RowKey.ToUpper() == newAcronym.ToUpper())
+                        longName = entity.longName;
+                }
+
+                if (longName.Length > 0) // Means already in db
+                {
+                    PromptDialog.Confirm(
+                        context,
+                        StoreConfirmedAcronymAsync,
+                        "But got people say that " + newAcronym + " means " + longName + " already leh? You sure yours correct ah...",
+                        "Choose one of the choices can?",
+                        promptStyle: PromptStyle.Auto);
+                }
+                else // Means new - see how to refactor this fn
+                {
+                    try
+                    {
+                        string newAcronym = "";
+                        string newAcronymMeaning = "";
+
+                        context.UserData.TryGetValue("newAcronym", out newAcronym);
+                        context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
+
+                        CloudTable table = ConnectToTableStorage.Connect("acronyms");
+
+                        AcronymEntity record = new AcronymEntity("JTC", newAcronym);
+                        record.longName = newAcronymMeaning;
+                        record.description = "-";
+
+                        TableOperation insertOperation = TableOperation.InsertOrMerge(record);
+
+                        table.Execute(insertOperation);
+                        await context.PostAsync("Great! Learnt something new today!");
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
+                        await context.PostAsync("Sorry something went wrong!");
+                    }
+                }
+            }
+            else
+                await context.PostAsync("Nope, wrong password.");
+            context.Wait(MessageReceivedAsync);
+
+        }
+
+        private async Task StoreConfirmedAcronymAsync(IDialogContext context, IAwaitable<bool> result)
+        {
+            var confirm = await result;
+            if (confirm)
             {
                 try
                 {
                     string newAcronym = "";
                     string newAcronymMeaning = "";
-                    
+
                     context.UserData.TryGetValue("newAcronym", out newAcronym);
                     context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
 
@@ -223,7 +285,9 @@ namespace Microsoft.Bot.Sample.QnABot
                 }
             }
             else
-                await context.PostAsync("Nope, wrong password.");
+            {
+                await context.PostAsync("...");
+            }
             context.Wait(MessageReceivedAsync);
         }
     }
