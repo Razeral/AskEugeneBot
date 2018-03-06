@@ -221,9 +221,10 @@ namespace Microsoft.Bot.Sample.QnABot
                     PromptDialog.Confirm(
                         context,
                         StoreConfirmedAcronymAsync,
-                        "But got people say that " + newAcronym + " means " + longName + " already leh? You sure yours correct ah...",
+                        "But got people say that " + newAcronym.ToUpper() + " means " + longName + " already leh? You sure yours correct ah...",
                         "Choose one of the choices can?",
                         promptStyle: PromptStyle.Auto);
+                    return;
                 }
                 else // Means new - see how to refactor this fn
                 {
@@ -262,6 +263,7 @@ namespace Microsoft.Bot.Sample.QnABot
 
         private async Task StoreConfirmedAcronymAsync(IDialogContext context, IAwaitable<bool> result)
         {
+            System.Diagnostics.Trace.TraceInformation("In StoreConfirmed");
             var confirm = await result;
             if (confirm)
             {
