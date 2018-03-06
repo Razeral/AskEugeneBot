@@ -73,6 +73,8 @@ namespace Microsoft.Bot.Sample.QnABot
                 }
                 else
                 {
+                    var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
+
                     Random rnd = new Random();
                     int i = rnd.Next(1, 3);
                     var question = "";
@@ -89,9 +91,7 @@ namespace Microsoft.Bot.Sample.QnABot
                             question = "Ummm. Ok... " + newAcronym + " is?";
                             break;
                     }
-
-                    var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
-
+                    
                     await context.PostAsync(question);
                     context.UserData.SetValue("newAcronym", newAcronym.ToUpper());
                     context.Wait(TeachAcronymAsync);
