@@ -61,7 +61,7 @@ namespace Microsoft.Bot.Sample.QnABot
 
             var msg = "";
             var isFirstWordTeach = (message.Text.Split(' '))[0].ToLower() == "teach";
-            var wordCount = message.Text.Split(' ');
+            var wordCount = (message.Text.Split(' ')).Length;
 
             if (isFirstWordTeach)
             {
@@ -75,7 +75,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
 
                     await context.PostAsync("What does " + newAcronym + " mean?");
-                    context.UserData.SetValue("newAcronym", newAcronym);
+                    context.UserData.SetValue("newAcronym", newAcronym.ToUpper());
                     context.Wait(TeachAcronymAsync);
                 }
             }
