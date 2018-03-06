@@ -205,48 +205,59 @@ namespace Microsoft.Bot.Sample.QnABot
 
                 CloudTable table = ConnectToTableStorage.Connect("acronyms");
 
-                TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, newAcronym));
-                foreach (AcronymEntity entity in table.ExecuteQuery(query))
-                {
-                    if (entity.RowKey.ToUpper() == newAcronym.ToUpper())
-                        longName = entity.longName;
-                }
+                System.Diagnostics.Trace.TraceInformation("before row lookup");
 
-                if (longName.Length > 0) // Means already in db
+                try
                 {
-                    PromptDialog.Confirm(
-                        context,
-                        StoreConfirmedAcronymAsync,
-                        "But got people say that " + newAcronym + " means " + longName + " already leh? You sure yours correct ah...",
-                        "Choose one of the choices can?",
-                        promptStyle: PromptStyle.Auto);
-                }
-                else // Means new - see how to refactor this fn
-                {
-                    try
+                    TableQuery<AcronymEntity> query = new TableQuery<AcronymEntity>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, newAcronym));
+                    foreach (AcronymEntity entity in table.ExecuteQuery(query))
                     {
-                        //string newAcronym = "";
-                        string newAcronymMeaning = "";
-
-                        context.UserData.TryGetValue("newAcronym", out newAcronym);
-                        context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
-
-                        //CloudTable table = ConnectToTableStorage.Connect("acronyms");
-
-                        AcronymEntity record = new AcronymEntity("JTC", newAcronym);
-                        record.longName = newAcronymMeaning;
-                        record.description = "-";
-
-                        TableOperation insertOperation = TableOperation.InsertOrMerge(record);
-
-                        table.Execute(insertOperation);
-                        await context.PostAsync("Great! Learnt something new today!");
+                        if (entity.RowKey.ToUpper() == newAcronym.ToUpper())
+                            longName = entity.longName;
                     }
-                    catch (Exception e)
+
+
+                    if (longName.Length > 0) // Means already in db
                     {
-                        System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
-                        await context.PostAsync("Sorry something went wrong!");
+                        PromptDialog.Confirm(
+                            context,
+                            StoreConfirmedAcronymAsync,
+                            "But got people say that " + newAcronym + " means " + longName + " already leh? You sure yours correct ah...",
+                            "Choose one of the choices can?",
+                            promptStyle: PromptStyle.Auto);
                     }
+                    else // Means new - see how to refactor this fn
+                    {
+                        try
+                        {
+                            //string newAcronym = "";
+                            string newAcronymMeaning = "";
+
+                            context.UserData.TryGetValue("newAcronym", out newAcronym);
+                            context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
+
+                            //CloudTable table = ConnectToTableStorage.Connect("acronyms");
+
+                            AcronymEntity record = new AcronymEntity("JTC", newAcronym);
+                            record.longName = newAcronymMeaning;
+                            record.description = "-";
+
+                            TableOperation insertOperation = TableOperation.InsertOrMerge(record);
+
+                            table.Execute(insertOperation);
+                            await context.PostAsync("Great! Learnt something new today!");
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
+                            await context.PostAsync("Sorry something went wrong!");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
+                    await context.PostAsync("Sorry something went wrong!");
                 }
             }
             else
