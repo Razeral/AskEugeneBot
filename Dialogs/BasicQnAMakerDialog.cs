@@ -41,8 +41,6 @@ namespace Microsoft.Bot.Sample.QnABot
             return tableClient.GetTableReference(TableName);
         }
     }
-    
-
 
     [Serializable]
     public class RootDialog : IDialog<object>
@@ -76,7 +74,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     var newAcronym = message.Text.Substring(("teach").Length + 1).Trim().ToUpper();
 
                     Random rnd = new Random();
-                    int i = rnd.Next(1, 3);
+                    int i = rnd.Next(1, 4);
                     var question = "";
 
                     switch(i)
@@ -108,6 +106,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     {
                         if (entity.RowKey.ToUpper() == message.Text.Trim().ToUpper())
                         {
+                            msg == "" ? msg += entity.longName : msg += " or " + entity.longName;
                             if (msg == "")
                                 msg += entity.longName;
                             else
@@ -118,7 +117,7 @@ namespace Microsoft.Bot.Sample.QnABot
                     if (msg.Length > 0)
                     {
                         Random rnd = new Random();
-                        int i = rnd.Next(1, 3);
+                        int i = rnd.Next(1, 4);
                         var reply = "";
 
                         switch (i)
@@ -171,32 +170,16 @@ namespace Microsoft.Bot.Sample.QnABot
 
             PromptDialog.Confirm(
                 context,
-                StoreAcronymAsync,
+                CheckDuplicateAsync,
                 "So " + newAcronym + " stands for " + message.Text + "?",
                 "Choose one of the choices can?",
                 promptStyle: PromptStyle.Auto);
         }
 
-        private async Task StoreAcronymAsync(IDialogContext context, IAwaitable<bool> result)
+        private async Task CheckDuplicateAsync(IDialogContext context, IAwaitable<bool> result)
         {
             var confirm = await result;
             if (confirm)
-            {
-                await context.PostAsync("What's the password?");
-                //context.Wait(StoreConfirmedAcronymAsync);
-                context.Wait(ConfirmConfirmedAcronymAsync);
-            }
-            else
-            {
-                await context.PostAsync("Then talk so much for what...");
-                context.Wait(MessageReceivedAsync);
-            }
-        }
-
-        private async Task ConfirmConfirmedAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
-        {
-            var message = await result;
-            if (message.Text.ToLower() == "jtcivsd1")
             {
                 string newAcronym = "";
                 context.UserData.TryGetValue("newAcronym", out newAcronym);
@@ -220,52 +203,45 @@ namespace Microsoft.Bot.Sample.QnABot
                     System.Diagnostics.Trace.TraceInformation("in if");
                     PromptDialog.Confirm(
                         context,
-                        StoreConfirmedAcronymAsync,
+                        UpdateAcronymAsync,
                         "But got people say that " + newAcronym.ToUpper() + " means " + longName + " already leh? You sure yours correct ah...",
                         "Choose one of the choices can?",
                         promptStyle: PromptStyle.Auto);
                     return;
                 }
-                else // Means new - see how to refactor this fn
+                else // Means new - so check password
                 {
-                    System.Diagnostics.Trace.TraceInformation("in else");
-                    try
-                    {
-                        //string newAcronym = "";
-                        string newAcronymMeaning = "";
-
-                        context.UserData.TryGetValue("newAcronym", out newAcronym);
-                        context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
-
-                        //CloudTable table = ConnectToTableStorage.Connect("acronyms");
-
-                        AcronymEntity record = new AcronymEntity("JTC", newAcronym);
-                        record.longName = newAcronymMeaning;
-                        record.description = "-";
-
-                        TableOperation insertOperation = TableOperation.InsertOrMerge(record);
-
-                        table.Execute(insertOperation);
-                        await context.PostAsync("Great! Learnt something new today!");
-                    }
-                    catch (Exception e)
-                    {
-                        System.Diagnostics.Trace.TraceInformation(e.Message + " || " + e.StackTrace);
-                        await context.PostAsync("Sorry something went wrong!");
-                    }
+                    await context.PostAsync("What's the password?");
+                    context.Wait(CheckPasswordAsync);
                 }
             }
             else
-                await context.PostAsync("Nope, wrong password.");
-            context.Wait(MessageReceivedAsync);
+            {
+                await context.PostAsync("Then talk so much for what...");
+                context.Wait(MessageReceivedAsync);
+            }
+        }
+
+        private async Task UpdateAcronymAsync(IDialogContext context, IAwaitable<bool> result)
+        {
+            var confirm = await result;
+            if (confirm)
+            {
+                await context.PostAsync("Ok lo. What's the password?");
+                context.Wait(CheckPasswordAsync);
+            }
+            else
+            {
+                await context.PostAsync("...");
+                context.Wait(MessageReceivedAsync);
+            }
 
         }
 
-        private async Task StoreConfirmedAcronymAsync(IDialogContext context, IAwaitable<bool> result)
+        private async Task CheckPasswordAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
-            System.Diagnostics.Trace.TraceInformation("In StoreConfirmed");
-            var confirm = await result;
-            if (confirm)
+            var message = await result;
+            if (message.Text.ToLower() == "jtcivsd1")
             {
                 try
                 {
@@ -294,7 +270,7 @@ namespace Microsoft.Bot.Sample.QnABot
             }
             else
             {
-                await context.PostAsync("...");
+                await context.PostAsync("Nope, wrong password.");
             }
             context.Wait(MessageReceivedAsync);
         }
