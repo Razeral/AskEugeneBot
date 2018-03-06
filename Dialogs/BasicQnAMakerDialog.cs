@@ -195,6 +195,7 @@ namespace Microsoft.Bot.Sample.QnABot
 
         private async Task ConfirmConfirmedAcronymAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
+            var message = await result;
             if (message.Text.ToLower() == "jtcivsd1")
             {
                 string newAcronym = "";
@@ -224,13 +225,13 @@ namespace Microsoft.Bot.Sample.QnABot
                 {
                     try
                     {
-                        string newAcronym = "";
+                        //string newAcronym = "";
                         string newAcronymMeaning = "";
 
                         context.UserData.TryGetValue("newAcronym", out newAcronym);
                         context.UserData.TryGetValue("newAcronymMeaning", out newAcronymMeaning);
 
-                        CloudTable table = ConnectToTableStorage.Connect("acronyms");
+                        //CloudTable table = ConnectToTableStorage.Connect("acronyms");
 
                         AcronymEntity record = new AcronymEntity("JTC", newAcronym);
                         record.longName = newAcronymMeaning;
