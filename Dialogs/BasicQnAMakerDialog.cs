@@ -106,7 +106,6 @@ namespace Microsoft.Bot.Sample.QnABot
                     {
                         if (entity.RowKey.ToUpper() == message.Text.Trim().ToUpper())
                         {
-                            msg == "" ? msg += entity.longName : msg += " or " + entity.longName;
                             if (msg == "")
                                 msg += entity.longName;
                             else
