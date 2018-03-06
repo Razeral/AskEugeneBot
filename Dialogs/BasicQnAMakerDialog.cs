@@ -96,9 +96,9 @@ namespace Microsoft.Bot.Sample.QnABot
                         {
                             if (msg == "")
                                 msg += entity.longName;
+                            else
+                                msg += " or " + entity.longName;
                         }
-                        else
-                            msg += " or " + entity.longName;
                     }
 
                     if (msg.Length > 0)
