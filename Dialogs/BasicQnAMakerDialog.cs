@@ -54,9 +54,9 @@ namespace Microsoft.Bot.Sample.QnABot
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> result)
         {
             var message = await result;
-            //System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text);
-            //string json = JsonConvert.SerializeObject(message, Formatting.Indented);
-            //System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
+            System.Diagnostics.Trace.TraceInformation("Message received - " + message.Text);
+            string json = JsonConvert.SerializeObject(message, Formatting.Indented);
+            System.Diagnostics.Trace.TraceInformation("<<<MESSAGE>>> - " + json);
 
             var msg = "";
             var isFirstWordTeach = (message.Text.Split(' '))[0].ToLower() == "teach";
